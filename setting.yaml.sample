@@ -1,0 +1,8 @@
+# account
+username: "your name"
+password: "your password"
+
+# server
+host: "127.0.0.1"
+port: 5000
+root_dir: "/home/ubuntu/photos"
