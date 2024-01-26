@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <body
     style="background-color: black; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
-
     <img id="image-viewer" src="" style="max-width: 100%; max-height: 100vh;">
     <button id="prev-button"
         style="position: fixed; top: 50%; left: 20%; transform: translateY(-50%); font-size: 3em; background-color: transparent; color: white; border: none; opacity: 0.5;"
@@ -13,11 +13,16 @@
         style="position: fixed; top: 50%; right: 20%; transform: translateY(-50%); font-size: 3em; background-color: transparent; color: white; border: none; opacity: 0.5;"
         onclick="changeImage(1)">&gt;</button>
     <div id="delete-button"
-        style="position: fixed; bottom: 20px; right: 20px; font-size: 1em; background-color: transparent; color: white; border: 2px solid white; padding: 10px 20px;">
+        style="position: fixed; bottom: 20px; right: 20px; font-size: 1em; background-color: transparent; color: white; border: 1px solid white; padding: 10px 20px;">
         <button onclick="deleteImage()"
             style="background-color: transparent; color: white; border: none;">Delete</button>
     </div>
-
+    <div id="jump-to-image" style="position: fixed; bottom: 20px; left: 20px;">
+        <input type="number" id="image-index"
+            style="background-color: transparent; color: white; border: 1px solid white; padding: 10px; font-size: 1em;">
+        <button onclick="jumpToImage()"
+            style="background-color: transparent; color: white; border: 1px solid white; padding: 10px; font-size: 1em;">Jump</button>
+    </div>
 </body>
 
 <div id="modal"
@@ -50,14 +55,7 @@
             showModal();
         });
 
-    var root_dir = '/photos/'
-
-    function updateImage() {
-        var image = images[imageIndex];
-        var imageViewer = document.getElementById('image-viewer');
-        imageViewer.src = root_dir + image;
-        window.history.pushState({}, '', '?index=' + imageIndex);
-    }
+    var root_dir = '/photos/';
 
     function changeImage(step) {
         imageIndex += step;
@@ -106,12 +104,14 @@
         document.getElementById('prev-button').style.visibility = 'hidden';
         document.getElementById('next-button').style.visibility = 'hidden';
         document.getElementById('delete-button').style.visibility = 'hidden';
+        document.getElementById('jump-to-image').style.visibility = 'hidden';
     }
 
     function showButtons() {
         document.getElementById('prev-button').style.visibility = '';
         document.getElementById('next-button').style.visibility = '';
         document.getElementById('delete-button').style.visibility = '';
+        document.getElementById('jump-to-image').style.visibility = '';
     }
 
     function handleMouseMove() {
@@ -148,6 +148,7 @@
         document.addEventListener('touchstart', handleTouchStart, false);
         document.addEventListener('touchend', handleTouchEnd, false);
     }
+
     function showModal() {
         if ('ontouchstart' in window && !localStorage.getItem('dontShowModal')) {
             document.getElementById('modal').style.display = 'flex';
@@ -160,6 +161,43 @@
         }
         document.getElementById('modal').style.display = 'none';
     }
+
+    function updateImage() {
+        var image = images[imageIndex];
+        var imageViewer = document.getElementById('image-viewer');
+        imageViewer.src = root_dir + image;
+        window.history.pushState({}, '', '?index=' + imageIndex);
+        var imageInfo = 'Image ' + (imageIndex + 1) + ' of ' + images.length;
+        document.getElementById('image-index').placeholder = imageInfo;
+    }
+
+    function jumpToImage() {
+        var indexInput = document.getElementById('image-index');
+        var index = parseInt(indexInput.value);
+        if (index >= 0 && index < images.length) {
+            imageIndex = index;
+            updateImage();
+            preloadImages(imageIndex + 1, imageIndex + initialPreloadCount + 1);
+            resetTimer();
+        } else {
+            alert('Invalid image index');
+        }
+        indexInput.value = '';
+    }
 </script>
+
+<style>
+    @media (min-width: 768px) {
+        #jump-to-image {
+            font-size: 1em;
+        }
+    }
+
+    @media (max-width: 767px) {
+        #jump-to-image {
+            font-size: 0.5em;
+        }
+    }
+</style>
 
 </html>
