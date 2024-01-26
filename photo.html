@@ -5,6 +5,7 @@
 
 <body
     style="background-color: black; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+
     <img id="image-viewer" src="" style="max-width: 100%; max-height: 100vh;">
     <button id="prev-button"
         style="position: fixed; top: 50%; left: 20%; transform: translateY(-50%); font-size: 3em; background-color: transparent; color: white; border: none; opacity: 0.5;"
@@ -12,10 +13,9 @@
     <button id="next-button"
         style="position: fixed; top: 50%; right: 20%; transform: translateY(-50%); font-size: 3em; background-color: transparent; color: white; border: none; opacity: 0.5;"
         onclick="changeImage(1)">&gt;</button>
-    <div id="delete-button"
-        style="position: fixed; bottom: 20px; right: 20px; font-size: 1em; background-color: transparent; color: white; border: 1px solid white; padding: 10px 20px;">
+    <div id="delete-button" style="position: fixed; bottom: 20px; right: 20px;">
         <button onclick="deleteImage()"
-            style="background-color: transparent; color: white; border: none;">Delete</button>
+            style="background-color: transparent; color: white; border: 1px solid white; padding: 10px; font-size: 1em;">Delete</button>
     </div>
     <div id="jump-to-image" style="position: fixed; bottom: 20px; left: 20px;">
         <input type="number" id="image-index"
@@ -124,7 +124,20 @@
         timer = setTimeout(hideButtons, 2000);
     }
 
+    function handleInputFocus() {
+        clearTimeout(timer);
+        showButtons();
+    }
+
+    function handleInputBlur() {
+        resetTimer();
+    }
+
     document.addEventListener('mousemove', handleMouseMove);
+
+    var imageIndexInput = document.getElementById('image-index');
+    imageIndexInput.addEventListener('focus', handleInputFocus);
+    imageIndexInput.addEventListener('blur', handleInputBlur);
 
     function handleTouchStart(event) {
         touchStartX = event.touches[0].clientX;
@@ -144,11 +157,10 @@
     if ('ontouchstart' in window) {
         document.getElementById('prev-button').style.display = 'none';
         document.getElementById('next-button').style.display = 'none';
-        document.getElementById('delete-button').style.display = 'none';
+        document.getElementById('delete-button').style.display = '';
         document.addEventListener('touchstart', handleTouchStart, false);
         document.addEventListener('touchend', handleTouchEnd, false);
     }
-
     function showModal() {
         if ('ontouchstart' in window && !localStorage.getItem('dontShowModal')) {
             document.getElementById('modal').style.display = 'flex';
@@ -194,7 +206,12 @@
     }
 
     @media (max-width: 767px) {
+
         #jump-to-image {
+            font-size: 0.5em;
+        }
+
+        #delete-button {
             font-size: 0.5em;
         }
     }
