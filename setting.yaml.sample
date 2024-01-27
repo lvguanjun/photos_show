@@ -5,4 +5,4 @@ password: "your password"
 # server
 host: "127.0.0.1"
 port: 5000
-root_dir: "/home/ubuntu/photos"
+root_dir: "/var/www/example.com/static/photos/"
