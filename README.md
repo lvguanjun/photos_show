@@ -33,7 +33,7 @@ server {
     }
 
     location = /photos/ {
-        rewrite ^ /photos break;
+        rewrite ^ /photos last;
     }
 
     location = /photos {

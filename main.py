@@ -35,9 +35,11 @@ def delete_image(filename):
     os.remove(os.path.join(root_dir, filename))
     return "", 204
 
+
 @app.route("/")
 def show_html():
     return app.send_static_file("photos.html")
+
 
 @auth.verify_password
 def verify_password(username, password):
