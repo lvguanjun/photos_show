@@ -44,6 +44,12 @@
     var touchEndX = 0;
     var initialPreloadCount = 7;
 
+    var jumpCounter = 0;
+    var lastJumpTime = Date.now();
+    var jumpLimit = 3; // Maximum jumps within the time limit
+    var jumpTimeLimit = 30 * 60 * 1000; // Time limit in milliseconds (30 minutes)
+    var jumpAlertMessage = '温馨提示：该页面存在预加载图片，若非必要，不要频繁跳转位置，左右滑即可流畅切换图片。';
+
     fetch('/api/images')
         .then(response => response.json())
         .then(data => {
@@ -184,6 +190,24 @@
     }
 
     function jumpToImage() {
+        var now = Date.now();
+        var lastJumpTime = localStorage.getItem('lastJumpTime');
+        var jumpCounter = localStorage.getItem('jumpCounter');
+
+        if (!lastJumpTime || !jumpCounter || now - lastJumpTime > jumpTimeLimit) {
+            // Reset the counter and timestamp if the time limit has passed
+            jumpCounter = 0;
+            lastJumpTime = now;
+            localStorage.setItem('lastJumpTime', lastJumpTime);
+            localStorage.setItem('jumpCounter', jumpCounter);
+        }
+
+        if (jumpCounter >= jumpLimit) {
+            // If the jump limit has been reached, show an alert and don't jump
+            alert(jumpAlertMessage);
+            return;
+        }
+
         var indexInput = document.getElementById('image-index');
         var index = parseInt(indexInput.value);
         if (index >= 0 && index < images.length) {
@@ -191,6 +215,8 @@
             updateImage();
             preloadImages(imageIndex + 1, imageIndex + initialPreloadCount + 1);
             resetTimer();
+            jumpCounter++; // Increment the counter for each successful jump
+            localStorage.setItem('jumpCounter', jumpCounter);
         } else {
             alert('Invalid image index');
         }
